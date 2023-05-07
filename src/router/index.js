@@ -29,6 +29,11 @@ const routes = [
         name: "AgentManage",
         component: () => import("@/pages/agent/agent-manage/index.vue"),
       },
+      {
+        path: "/permissions/roles",
+        name: "RolesManage",
+        component: () => import("@/pages/permissions/roles/index.vue"),
+      },
     ],
   },
   {

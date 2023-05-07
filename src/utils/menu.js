@@ -22,6 +22,17 @@ export const menu = [
     ],
   },
   {
+    label: "Quản lý quyền hạn",
+    items: [
+      {
+        label: "Quản lý roles",
+        icon: "pi pi-fw pi-star-fill",
+        to: "/permissions/roles"
+      }
+    ]
+  },
+
+  {
     label: "Tài khoản",
     icon: "pi pi-fw pi-sitemap",
     items: [{ label: "Quản lý tài khoản", icon: "pi pi-users", to: "/users" }],
