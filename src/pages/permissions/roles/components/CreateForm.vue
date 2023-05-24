@@ -15,26 +15,26 @@
       >
         <label for="key">{{ item.label }}</label>
         <span class="relative">
+          <InputSwitch
+            v-if="item.name === 'status'"
+            :id="'key' + item.name"
+            v-model="formValues[item.name]"
+            required="true"
+            autofocus
+            class = "button"
+            :class="{
+              'p-invalid': submitted && !formValues[item.name],
+            }"
+          />
+
           <InputText
-            v-if="item.name === 'agency'"
+            v-else
             :id="'key' + item.name"
             v-model.trim="formValues[item.name]"
             required="true"
             autofocus
             :class="{
-              'p-invalid': submitted && !formValues[item.name],
-            }"
-          />
-          <InputNumber
-            v-else
-            :id="'key' + item.name"
-            v-model="formValues[item.name]"
-            required="true"
-            autofocus
-            mode="decimal"
-            :minFractionDigits="1"
-            :class="{
-              'p-invalid': submitted && !formValues[item.name],
+              'p-invalid': submitted && !formValues[item.name], 
             }"
           />
         </span>
@@ -49,6 +49,7 @@
           }}</small
         >
       </div>
+      
       <template #footer>
         <Button
           label="No"
@@ -65,9 +66,10 @@
 <script>
 import { computed, reactive, ref, watch } from 'vue';
 import {
-  createCommissionConfig,
-  updateCommissionConfig,
-} from '@/api/agent/commission.js';
+  createRoles,
+  updateRoles,
+  // deleteRoles
+} from '@/api/permissions/roles.js';
 import { userRolesEnums } from '@/enums/common.js';
 import useVuelidate from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
@@ -87,19 +89,19 @@ export default {
 
     const rules = computed(() => {
       return {
-        agency: {
+        name: {
           required: helpers.withMessage('Value không được trống', required),
         },
-        level1: {
+        guard_name: {
           required: helpers.withMessage('Value không được trống', required),
         },
-        level2: {
+        cn_name: {
           required: helpers.withMessage('Value không được trống', required),
         },
-        level3: {
+        description: {
           required: helpers.withMessage('Value không được trống', required),
         },
-        level4: {
+        status: {
           required: helpers.withMessage('Value không được trống', required),
         },
       };
@@ -107,11 +109,11 @@ export default {
     const v$ = useVuelidate(rules, formValues);
 
     const formItems = [
-      { label: 'Đại lý', name: 'agency' },
-      { label: 'Mức 1 (0-100tr)', name: 'level1' },
-      { label: 'Mức 2 (100tr-500tr)', name: 'level2' },
-      { label: 'Mức 3 (500tr-1 tỷ)', name: 'level3' },
-      { label: 'Mức 4 (Trên 1 tỷ)', name: 'level4' },
+      { label: 'Tên', name: 'name' },
+      { label: 'Loại', name: 'guard_name' },
+      { label: 'Tên chi tiết', name: 'cn_name' },
+      { label: 'Mô tả', name: 'description' },
+      { label: 'Có thể phân quyền', name: 'status' },
     ];
 
     watch(displayModal, (newValue) => {
@@ -123,11 +125,11 @@ export default {
     function handleRefreshForm() {
       submitted.value = false;
       formValues.id = '';
-      formValues.agency = '';
-      formValues.level1 = undefined;
-      formValues.level2 = undefined;
-      formValues.level3 = undefined;
-      formValues.level4 = undefined;
+      formValues.name = '';
+      formValues.guard_name = '';
+      formValues.cn_name = '';
+      formValues.description = '';
+      formValues.status = true;
     }
 
     function closeModal() {
@@ -136,20 +138,20 @@ export default {
 
     function setFormValues(row) {
       formValues.id = row.id;
-      formValues.agency = row.agency;
-      formValues.level1 = row.level1;
-      formValues.level2 = row.level2;
-      formValues.level3 = row.level3;
-      formValues.level4 = row.level4;
+      formValues.name = row.name;
+      formValues.guard_name = row.guard_name;
+      formValues.cn_name = row.cn_name;
+      formValues.description = row.description;
+      formValues.status = row.status;
     }
 
     function submitModal() {
       submitted.value = true;
       let params = formValues;
       if (!v$.value.$invalid) {
-        let func = createCommissionConfig;
+        let func = createRoles;
         if (!isAdd.value) {
-          func = updateCommissionConfig;
+          func = updateRoles;
         }
         func(params).then(() => {
           context.emit('onSuccess');
@@ -174,4 +176,9 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.button {
+  display: block;
+}
+
+</style>

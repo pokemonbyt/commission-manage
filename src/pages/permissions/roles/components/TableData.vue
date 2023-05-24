@@ -37,18 +37,24 @@
         style="width: 17%"
         :showFilterMatchModes="false"
       >
-        <template #filter="{ filterModel }" v-if="col.field === 'agency'">
+        <template #filter="{ filterModel }" v-if="col.field === 'name'">
           <InputText
             type="text"
             v-model="filterModel.value"
             class="p-column-filter"
-            placeholder="Đại lý"
+            placeholder="Tên"
           />
         </template>
         <template #body="{ data, field }">
-          <span>{{
-            field === 'agency' ? data[field] : `${data[field]}%`
-          }}</span>
+          <span v-if="col.field !== 'status' && col.field !== 'created_at'">{{ data[field] }}</span>
+
+          <span v-else-if="col.field === 'created_at'">{{ formatDate(data[field]) }}</span>
+  
+          <Checkbox
+        v-else-if="col.field === 'status'"
+      :modelValue="data[field] === 1"
+      :binary="true"
+  />
         </template>
       </Column>
       <Column :exportable="false" style="min-width: 10%">
@@ -87,8 +93,9 @@ import { useInitConfirm } from '@/hooks/use-confirm.js';
 import { setToast } from '@/utils/auth';
 import TableToolbar from './TableToolbar.vue';
 import { FilterMatchMode } from 'primevue/api';
-import { listApi, deleteCommissionConfig } from '@/api/agent/commission.js';
+import { listApi, deleteRoles } from '@/api/permissions/roles.js';
 import CreateForm from './CreateForm.vue';
+import moment from 'moment';
 export default {
   name: 'TableData',
   components: {
@@ -96,7 +103,12 @@ export default {
     CreateForm,
   },
   data() {
-    return {};
+  
+  },
+  methods: {
+    formatDate(date) {
+      return moment(date).format('YYYY-MM-DD HH:mm:ss');
+    }
   },
   setup(props, context) {
     const {
@@ -130,6 +142,7 @@ export default {
       { field: 'guard_name', header: 'Loại' },
       { field: 'cn_name', header: 'Tên chi tiết' },
       { field: 'description', header: 'Mô tả' },
+      { field: 'status', header: 'Được phép phân quyền' },
       { field: 'created_at', header: 'Thời gian tạo' },
     ];
 
@@ -142,7 +155,7 @@ export default {
     });
 
     function handleInitData() {
-      setUrl(listApi.getAgentConfigUrl);
+      setUrl(listApi.getRolesUrl);
       setParams({ is_paginate: 1 });
       init();
     }
@@ -157,7 +170,7 @@ export default {
 
     function handleDoDelete(row) {
       let params = { id: row.id };
-      deleteCommissionConfig(params).then(() => {
+      deleteRoles(params).then(() => {
         init();
         setToast({
           type: 'success',

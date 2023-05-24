@@ -37,15 +37,17 @@ export default {
   setup(props, context) {
     const filter = ref('');
 
+
     const header = [
-      'Đại lý',
-      'Mức 1 (0-100tr)',
-      'Mức 2 (100tr-500tr)',
-      'Mức 3 (500tr-1 tỷ)',
-      'Mức 4 (Trên 1 tỷ)',
+      'Tên',
+      'Loại',
+      'Tên chi tiết',
+      'Mô tả',
+      'Được phân quyền',
+      'Thời gian tạo',
     ];
 
-    const fieldValue = ['agency', 'level1', 'level2', 'level3', 'level4'];
+    const fieldValue = ['name', 'guard_name', 'cn_name', 'description', 'status', 'created_at'];
 
     watch(filter, (newValue) => {
       context.emit('onFilter', newValue);

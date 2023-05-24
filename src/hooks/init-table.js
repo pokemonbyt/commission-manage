@@ -8,6 +8,7 @@
 import { ref, computed, watch } from 'vue';
 import { initData } from '@/api/data';
 import { useStore } from 'vuex';
+import moment from 'moment';
 
 export function useInitTable() {
   const loading = ref(false);
@@ -110,7 +111,14 @@ export function useInitTable() {
       await initExportData(i, maxLimit).then((res) => {
         if (res.data) {
           if (res.data.data) {
-            dataExport = dataExport.concat(res.data.data);
+
+            //Nemsy: convert created_at to YYYY-MM-DD HH:mm:ss
+            const dataz = res.data.data;
+            const formattedData = dataz.map((item) => ({
+              ...item,
+              created_at: formatDate(item.created_at),
+            }));
+            dataExport = dataExport.concat(formattedData);
           } else {
             dataExport = dataExport.concat(res.data);
           }
@@ -142,6 +150,11 @@ export function useInitTable() {
     }
 
     return true;
+  }
+
+  // Convert date time to YYYY-MM-DD HH:mm:ss
+  function formatDate(date) {
+    return moment(date).format('YYYY-MM-DD HH:mm:ss');
   }
 
   //get header
